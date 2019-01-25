@@ -30,6 +30,9 @@ class PartialParse(object):
         ###
         ### Note: The root token should be represented with the string "ROOT"
         ###
+        self.stack = ["ROOT"]
+        self.buffer = list(sentence)
+        self.dependencies = []
 
 
         ### END YOUR CODE
@@ -49,7 +52,17 @@ class PartialParse(object):
         ###         1. Shift
         ###         2. Left Arc
         ###         3. Right Arc
-
+        if transition == "S":
+            self.stack.append(self.buffer[0])
+            del self.buffer[0]
+        elif transition == "LA":
+            self.dependencies.append( (self.stack[-1], self.stack[-2]) )
+            del self.stack[-2]
+        elif transition == "RA":
+            self.dependencies.append( (self.stack[-2], self.stack[-1]) )
+            del self.stack[-1]
+        else :
+            raise ValueError("invalid transition {}".format(transition))
 
         ### END YOUR CODE
 
@@ -85,7 +98,7 @@ def minibatch_parse(sentences, model, batch_size):
                                                     same as in sentences (i.e., dependencies[i] should
                                                     contain the parse for sentences[i]).
     """
-    dependencies = []
+    dependencies = [[] for s in sentences]
 
     ### YOUR CODE HERE (~8-10 Lines)
     ### TODO:
@@ -100,7 +113,29 @@ def minibatch_parse(sentences, model, batch_size):
     ###             contains references to the same objects. Thus, you should NOT use the `del` operator
     ###             to remove objects from the `unfinished_parses` list. This will free the underlying memory that
     ###             is being accessed by `partial_parses` and may cause your code to crash.
+    partial_parses = [PartialParse(s) for s in sentences]
+    
+    # create a work area (= unfinished_parses) which associates a PartialParse with the original index
+    work = list(enumerate(partial_parses))
 
+    # while there is work to do
+    while len(work)>0:
+        current_size = min(batch_size, len(work))
+
+        # build the batch of PartialParse-s to process
+        batch = [i[1] for i in work[0 : current_size]]
+
+        # 
+        for b, transition in enumerate(model.predict(batch)):
+            oneDep = batch[b].parse([transition])
+            sentenceNdx = work[b][0]
+            dependencies[sentenceNdx]= oneDep
+        
+        # cleanup the parsed sentences
+        for i in reversed(range(0, current_size)):
+            head = work[i][1]
+            if len(head.buffer) == 0 and len(head.stack) == 1:
+                del work[i]
 
     ### END YOUR CODE
 
