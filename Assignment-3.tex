@@ -1,0 +1,103 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphics}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Assignment 3}
+\author{Marius Seritan}
+\maketitle
+
+
+\setlist[enumerate]{parsep=5pt}
+
+\begin{enumerate}[leftmargin=0pt,listparindent=0pt]
+\item \textbf{Machine Learning \& Neural Networks}
+
+\begin{enumerate}[leftmargin=0pt,listparindent=8pt]
+\item \textbf{Adam Optimizer}
+
+\begin{enumerate}[leftmargin=0pt,listparindent=0pt]
+
+\item \textbf{Momentum}
+
+The momentum is a rolling average of the gradient and is used to update the parameters. Taking the average reduces the variance and will help in the following two cases: 
+
+\begin{itemize}
+\item when away from the minimum the average will dampen "sideways" noise and concentrate the movement towards the bottom.
+\item when oscillating around the minimum successive gradients will point in opposite directions and will cancel out reducing the variance
+\end{itemize}
+
+\item \textbf{Magnitude}
+
+The learning rate is divided by an estimate of the square root of the magnitude of the momentum. 
+
+When the momentum is high this will reduce the magnitude of the updates and it can help, for example, in the final layers that may otherwise experience exploding gradients. 
+
+When the momentum is small, under 1, the small updates will be amplified. This can help in the initial layers that may experience a vanishing gradient.
+
+This simple formula also provides a way to do auto-tuning. 
+
+Note that since this is applied in vector form the different parameters will be increased or decreased based on their own individual behaviors.
+
+\end{enumerate}
+
+\item \textbf{Dropout}
+
+\begin{enumerate}[leftmargin=0pt,listparindent=0pt]
+
+\item \textbf{Value of constant $\gamma$}.
+
+The constant $\gamma$ in $h_{drop} = \gamma d \circ h$ should be set to $1-p_{drop}$. The rationale for this is that when units are dropped the remaining units get trained with bigger weights in order to be able to generate the same output. 
+
+\item \textbf{When to apply dropout}
+
+One of the rationale of applying dropout is that it generates an exponential number of thinned networks to be trained. Since these networks are trained separately there is less correlation between their units. 
+
+At evaluation time these separate networks are used as an ensemble in order to provide a more robust generalization. The ensemble is simply implemented by not using the dropout during evaluation.
+
+\end{enumerate}
+
+
+\end{enumerate}
+
+\item \textbf{Neural Transition-Based Dependency Parsing}
+
+\begin{enumerate}[leftmargin=0pt,listparindent=0pt] 
+\item \textbf{Transition table for sample sentence}
+
+We have the sentence 
+
+\texttt{ROOT I parsed this sentence correctly}
+
+The list of successive states for a \textit{transitioned-based parser} is
+
+\begin{tabular}{l|l|l|l}
+Stack & Buffer & New Dependency & Transition \\
+\midrule
+{[ ROOT ]} & [ I, parsed, this, sentence, correctly ] & & Initial configuration\\
+{[ ROOT, I]} & [ parsed, this, sentence, correctly] & & \texttt{SHIFT} \\
+{[ ROOT, I, parsed]} & [ this, sentence, correctly] & & \texttt{SHIFT} \\
+{[ ROOT, parsed]} & [ this, sentence, correctly] & \(\text{parsed} \rightarrow \text{I}\) & \texttt{LEFT - ARC} \\
+{[ ROOT, parsed, this]} & [ sentence, correctly] &  & \texttt{SHIFT} \\
+{[ ROOT, parsed, this, sentence]} & [ correctly] &  & \texttt{SHIFT} \\
+{[ ROOT, parsed, sentence]} & [ correctly] & \(\text{sentence} \rightarrow \text{this}\) & \texttt{LEFT - ARC} \\
+{[ ROOT, parsed]} & [ correctly] & \(\text{parsed} \rightarrow \text{sentence}\) & \texttt{RIGHT - ARC} \\
+{[ ROOT, parsed, correctly]} & [ ] & & \texttt{SHIFT} \\
+{[ ROOT, parsed]} & [ ] & \(\text{parsed} \rightarrow \text{correctly}\)& \texttt{RIGHT - ARC} \\
+{[ ROOT]} & [ ] & \(\text{ROOT} \rightarrow \text{parsed}\)& \texttt{RIGHT - ARC} \\
+\bottomrule
+\end{tabular}
+
+\item \textbf{Step numbers for a sentence of size $n$}
+
+We want to estimate the number of steps required to parse a sentence with $n$ words. For each word we will have to generate two transition: \texttt{SHIFT} and \texttt{* - ARC}. So the total numbers of steps will be $ 2 * n $, or if you want to count the initial state $ 2 *n + 1 $.
+
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
