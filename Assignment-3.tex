@@ -50,7 +50,10 @@ Note that since this is applied in vector form the different parameters will be 
 
 \item \textbf{Value of constant $\gamma$}.
 
-The constant $\gamma$ in $h_{drop} = \gamma d \circ h$ should be set to $1-p_{drop}$. The rationale for this is that when units are dropped the remaining units get trained with bigger weights in order to be able to generate the same output. 
+The constant $\gamma$ in $h_{drop} = \gamma d \circ h$ should be set to:
+ $$\frac{1}{1-p_{drop}}$$
+ 
+The rationale for this is that when units are dropped with the probability $p$ the remaining units get trained with bigger weights $1-p$ in order to be able to generate the same output. 
 
 \item \textbf{When to apply dropout}
 
@@ -95,6 +98,51 @@ Stack & Buffer & New Dependency & Transition \\
 
 We want to estimate the number of steps required to parse a sentence with $n$ words. For each word we will have to generate two transition: \texttt{SHIFT} and \texttt{* - ARC}. So the total numbers of steps will be $ 2 * n $, or if you want to count the initial state $ 2 *n + 1 $.
 
+\item[(c-e)] \textbf{Various coding tasks}
+
+Please see the attached code for the implementation.
+
+On the dev set the best UAS is $88.79$.
+
+On the test set the best UAS is $89.12$.
+
+\item[(f)] \textbf{Identify type of parsing error}
+
+\begin{enumerate}[leftmargin=0pt,listparindent=0pt]
+
+\item 
+
+\begin{itemize}
+\item \textbf{Error type}: Verb Phrase Attachment Error
+\item \textbf{Incorrect dependency}: $\text{fearing my own death} \rightarrow \text{wedding}$
+\item \textbf{Correct dependency}: $\text{fearing my own death} \rightarrow \text{was}$
+\end{itemize}
+
+\item 
+
+\begin{itemize}
+\item \textbf{Error type}: Coordination Attachment Error
+\item \textbf{Incorrect dependency}: $\text{rescue people from dilemmas} \rightarrow \text{makes}$
+\item \textbf{Correct dependency}: $\text{rescue people from dilemmas} \rightarrow \text{to rush out}$
+\end{itemize}
+
+\item 
+
+\begin{itemize}
+\item \textbf{Error type}: Prepositional Phrase Attachment Error
+\item \textbf{Incorrect dependency}: $\text{in Midland} \rightarrow \text{named}$
+\item \textbf{Correct dependency}: $\text{in Midland} \rightarrow \text{load}$
+\end{itemize}
+
+\item 
+
+\begin{itemize}
+\item \textbf{Error type}: Modifier Attachment Error
+\item \textbf{Incorrect dependency}: $\text{ROOT} \rightarrow \text{one}$
+\item \textbf{Correct dependency}: $\text{ROOT} \rightarrow \text{Brian}$
+\end{itemize}
+
+\end{enumerate}
 
 \end{enumerate}
 
